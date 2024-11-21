@@ -1,0 +1,166 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2761
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fmodern\fcharset0 Courier;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue255;\red245\green245\blue245;\red0\green0\blue0;
+\red101\green76\blue29;\red0\green0\blue109;\red157\green0\blue210;\red19\green85\blue52;\red15\green112\blue1;
+\red144\green1\blue18;\red31\green99\blue128;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c100000;\cssrgb\c96863\c96863\c96863;\cssrgb\c0\c0\c0;
+\cssrgb\c47451\c36863\c14902;\cssrgb\c0\c6275\c50196;\cssrgb\c68627\c0\c85882;\cssrgb\c6667\c40000\c26667;\cssrgb\c0\c50196\c0;
+\cssrgb\c63922\c8235\c8235;\cssrgb\c14510\c46275\c57647;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs28 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 def\cf0 \strokec4  \cf5 \strokec5 check_early_stopping\cf0 \strokec4 (\cf6 \strokec6 val_loss\cf0 \strokec4 , \cf6 \strokec6 best_val_loss\cf0 \strokec4 , \cf6 \strokec6 patience\cf0 \strokec4 , \cf6 \strokec6 counter\cf0 \strokec4 ):\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3     \cf7 \strokec7 if\cf0 \strokec4  val_loss < best_val_loss:\cb1 \
+\cb3         best_val_loss = val_loss\cb1 \
+\cb3         counter = \cf8 \strokec8 0\cf0 \cb1 \strokec4 \
+\cb3     \cf7 \strokec7 else\cf0 \strokec4 :\cb1 \
+\cb3         counter += \cf8 \strokec8 1\cf0 \cb1 \strokec4 \
+\cb3         \cf7 \strokec7 if\cf0 \strokec4  counter >= patience:\cb1 \
+\cb3             \cf7 \strokec7 return\cf0 \strokec4  \cf2 \strokec2 True\cf0 \strokec4 , best_val_loss, counter  \cf9 \strokec9 # Trigger early stopping\cf0 \cb1 \strokec4 \
+\cb3     \cb1 \
+\cb3     \cf7 \strokec7 return\cf0 \strokec4  \cf2 \strokec2 False\cf0 \strokec4 , best_val_loss, counter\cb1 \
+\
+\
+\
+\
+\
+\
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb3 \strokec7 import\cf0 \strokec4  pandas \cf7 \strokec7 as\cf0 \strokec4  pd\cb1 \
+\cf7 \cb3 \strokec7 import\cf0 \strokec4  numpy \cf7 \strokec7 as\cf0 \strokec4  np\cb1 \
+\cf7 \cb3 \strokec7 import\cf0 \strokec4  torch\cb1 \
+\cf7 \cb3 \strokec7 from\cf0 \strokec4  torch.utils.data \cf7 \strokec7 import\cf0 \strokec4  Dataset, DataLoader\cb1 \
+\cf7 \cb3 \strokec7 from\cf0 \strokec4  sklearn.preprocessing \cf7 \strokec7 import\cf0 \strokec4  StandardScaler,MinMaxScaler\cb1 \
+\cf7 \cb3 \strokec7 from\cf0 \strokec4  sklearn.metrics \cf7 \strokec7 import\cf0 \strokec4  mean_squared_error, r2_score\cb1 \
+\cf7 \cb3 \strokec7 from\cf0 \strokec4  sklearn.model_selection \cf7 \strokec7 import\cf0 \strokec4  train_test_split\cb1 \
+\cf7 \cb3 \strokec7 import\cf0 \strokec4  matplotlib.pyplot \cf7 \strokec7 as\cf0 \strokec4  plt\cb1 \
+\cf7 \cb3 \strokec7 import\cf0 \strokec4  torch.nn \cf7 \strokec7 as\cf0 \strokec4  nn\cb1 \
+\cf7 \cb3 \strokec7 import\cf0 \strokec4  torch.optim \cf7 \strokec7 as\cf0 \strokec4  optim\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3 data=pd.read_csv(\cf10 \strokec10 "auto-mpg.csv"\cf0 \strokec4 )\cb1 \
+\cb3 data\cb1 \
+\
+\cb3 data = data.dropna()\cb1 \
+\cb3 features = data[[\cf10 \strokec10 'cylinders'\cf0 \strokec4 , \cf10 \strokec10 'displacement'\cf0 \strokec4 , \cf10 \strokec10 'horsepower'\cf0 \strokec4 , \cf10 \strokec10 'weight'\cf0 \strokec4 , \cf10 \strokec10 'acceleration'\cf0 \strokec4 , \cf10 \strokec10 'model-year'\cf0 \strokec4 ]].values\cb1 \
+\cb3 target = data[\cf10 \strokec10 'mpg'\cf0 \strokec4 ].values\cb1 \
+\cb3 data\cb1 \
+\
+\cb3 scaler = StandardScaler()\cb1 \
+\cb3 features = scaler.fit_transform(features)\cb1 \
+\
+\cb3 features, features_test, target, target_test = train_test_split(features, target, test_size=\cf8 \strokec8 0.2\cf0 \strokec4 , random_state=\cf8 \strokec8 42\cf0 \strokec4 )\cb1 \
+\
+\cb3 features = torch.tensor(features, dtype=torch.float32)\cb1 \
+\cb3 target = torch.tensor(target, dtype=torch.float32)\cb1 \
+\cb3 features_test = torch.tensor(features_test, dtype=torch.float32)\cb1 \
+\cb3 target_test = torch.tensor(target_test, dtype=torch.float32)\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 class\cf0 \strokec4  \cf11 \strokec11 AutoMPGDataset\cf0 \strokec4 (\cf11 \strokec11 Dataset\cf0 \strokec4 ):\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3     \cf2 \strokec2 def\cf0 \strokec4  \cf5 \strokec5 __init__\cf0 \strokec4 (\cf6 \strokec6 self\cf0 \strokec4 , \cf6 \strokec6 features\cf0 \strokec4 , \cf6 \strokec6 target\cf0 \strokec4 ):\cb1 \
+\cb3         \cf6 \strokec6 self\cf0 \strokec4 .features = features\cb1 \
+\cb3         \cf6 \strokec6 self\cf0 \strokec4 .target = target\cb1 \
+\
+\cb3     \cf2 \strokec2 def\cf0 \strokec4  \cf5 \strokec5 __len__\cf0 \strokec4 (\cf6 \strokec6 self\cf0 \strokec4 ):\cb1 \
+\cb3         \cf7 \strokec7 return\cf0 \strokec4  \cf5 \strokec5 len\cf0 \strokec4 (\cf6 \strokec6 self\cf0 \strokec4 .target)\cb1 \
+\
+\cb3     \cf2 \strokec2 def\cf0 \strokec4  \cf5 \strokec5 __getitem__\cf0 \strokec4 (\cf6 \strokec6 self\cf0 \strokec4 , \cf6 \strokec6 idx\cf0 \strokec4 ):\cb1 \
+\cb3         \cf7 \strokec7 return\cf0 \strokec4  \cf6 \strokec6 self\cf0 \strokec4 .features[idx], \cf6 \strokec6 self\cf0 \strokec4 .target[idx]\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf9 \cb3 \strokec9 # dataset = AutoMPGDataset(features, target)\cf0 \cb1 \strokec4 \
+\cf9 \cb3 \strokec9 # dataloader = DataLoader(dataset, batch_size=32, shuffle=True)\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3 train_dataset = AutoMPGDataset(features, target)\cb1 \
+\cb3 test_dataset = AutoMPGDataset(features_test, target_test)\cb1 \
+\cb3 dataloader = DataLoader(train_dataset, batch_size=\cf8 \strokec8 32\cf0 \strokec4 , shuffle=\cf2 \strokec2 True\cf0 \strokec4 )\cb1 \
+\cb3 test_loader = DataLoader(test_dataset, batch_size=\cf8 \strokec8 32\cf0 \strokec4 , shuffle=\cf2 \strokec2 False\cf0 \strokec4 )\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 class\cf0 \strokec4  \cf11 \strokec11 PolynomialRegressionModel\cf0 \strokec4 (\cf11 \strokec11 nn\cf0 \strokec4 .\cf11 \strokec11 Module\cf0 \strokec4 ):\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3     \cf2 \strokec2 def\cf0 \strokec4  \cf5 \strokec5 __init__\cf0 \strokec4 (\cf6 \strokec6 self\cf0 \strokec4 , \cf6 \strokec6 input_dim\cf0 \strokec4 , \cf6 \strokec6 degree\cf0 \strokec4 , \cf6 \strokec6 dropout_rate\cf0 \strokec4 =\cf8 \strokec8 0.5\cf0 \strokec4 ):\cb1 \
+\cb3         super(PolynomialRegressionModel, \cf6 \strokec6 self\cf0 \strokec4 ).\cf5 \strokec5 __init__\cf0 \strokec4 ()\cb1 \
+\cb3         \cf6 \strokec6 self\cf0 \strokec4 .poly_features = nn.Linear(input_dim * degree, \cf8 \strokec8 1\cf0 \strokec4 )\cb1 \
+\cb3         \cf6 \strokec6 self\cf0 \strokec4 .dropout = nn.Dropout(dropout_rate)\cb1 \
+\
+\cb3     \cf2 \strokec2 def\cf0 \strokec4  \cf5 \strokec5 forward\cf0 \strokec4 (\cf6 \strokec6 self\cf0 \strokec4 , \cf6 \strokec6 x\cf0 \strokec4 ):\cb1 \
+\cb3         \cf9 \strokec9 # Create polynomial features\cf0 \cb1 \strokec4 \
+\cb3         poly_features = torch.cat([x**i \cf7 \strokec7 for\cf0 \strokec4  i \cf2 \strokec2 in\cf0 \strokec4  \cf5 \strokec5 range\cf0 \strokec4 (\cf8 \strokec8 1\cf0 \strokec4 , degree+\cf8 \strokec8 1\cf0 \strokec4 )], dim=\cf8 \strokec8 1\cf0 \strokec4 )\cb1 \
+\cb3         poly_features = \cf6 \strokec6 self\cf0 \strokec4 .dropout(poly_features)\cb1 \
+\cb3         \cf7 \strokec7 return\cf0 \strokec4  \cf6 \strokec6 self\cf0 \strokec4 .poly_features(poly_features)\cb1 \
+\
+\cb3 degree = \cf8 \strokec8 3\cf0 \strokec4   \cf9 \strokec9 # Polynomial degree\cf0 \cb1 \strokec4 \
+\cb3 dropout_rate = \cf8 \strokec8 0.5\cf0 \strokec4   \cf9 \strokec9 # Dropout rate\cf0 \cb1 \strokec4 \
+\
+\cb3 model = PolynomialRegressionModel(features.shape[\cf8 \strokec8 1\cf0 \strokec4 ], degree, dropout_rate)\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf9 \cb3 \strokec9 # Define loss and optimizer\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3 criterion = nn.MSELoss()\cb1 \
+\cb3 optimizer = optim.Adam(model.parameters(), lr=\cf8 \strokec8 0.01\cf0 \strokec4 , weight_decay=\cf8 \strokec8 1e-4\cf0 \strokec4 )  \cf9 \strokec9 # Adding L2 regularization\cf0 \cb1 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf9 \cb3 \strokec9 # Training loop\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3 num_epochs = \cf8 \strokec8 1000\cf0 \cb1 \strokec4 \
+\cb3 losses = []\cb1 \
+\
+\cb3 patience = \cf8 \strokec8 5\cf0 \cb1 \strokec4 \
+\cb3 best_val_loss = np.inf\cb1 \
+\cb3 counter = \cf8 \strokec8 0\cf0 \cb1 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb3 \strokec7 for\cf0 \strokec4  epoch \cf2 \strokec2 in\cf0 \strokec4  \cf5 \strokec5 range\cf0 \strokec4 (num_epochs):\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3     epoch_loss = \cf8 \strokec8 0\cf0 \cb1 \strokec4 \
+\cb3     \cf7 \strokec7 for\cf0 \strokec4  batch_features, batch_target \cf2 \strokec2 in\cf0 \strokec4  dataloader:\cb1 \
+\cb3         \cf9 \strokec9 # Forward pass\cf0 \cb1 \strokec4 \
+\cb3         outputs = model(batch_features)\cb1 \
+\cb3         loss = criterion(outputs.squeeze(), batch_target)\cb1 \
+\
+\cb3         \cf9 \strokec9 # Backward pass and optimization\cf0 \cb1 \strokec4 \
+\cb3         optimizer.zero_grad()\cb1 \
+\cb3         loss.backward()\cb1 \
+\cb3         optimizer.step()\cb1 \
+\
+\cb3         epoch_loss += loss.item()\cb1 \
+\
+\cb3     losses.append(epoch_loss / \cf5 \strokec5 len\cf0 \strokec4 (dataloader))\cb1 \
+\cb3     \cf7 \strokec7 if\cf0 \strokec4  (epoch+\cf8 \strokec8 1\cf0 \strokec4 ) % \cf8 \strokec8 10\cf0 \strokec4  == \cf8 \strokec8 0\cf0 \strokec4 :\cb1 \
+\cb3         \cf5 \strokec5 print\cf0 \strokec4 (\cf2 \strokec2 f\cf10 \strokec10 'Epoch [\cf0 \strokec4 \{epoch+\cf8 \strokec8 1\cf0 \strokec4 \}\cf10 \strokec10 /\cf0 \strokec4 \{num_epochs\}\cf10 \strokec10 ], Loss: \cf0 \strokec4 \{epoch_loss / \cf5 \strokec5 len\cf0 \strokec4 (dataloader)\cf8 \strokec8 :.4f\cf0 \strokec4 \}\cf10 \strokec10 '\cf0 \strokec4 )\cb1 \
+\
+\
+\
+\cb3 model.\cf5 \strokec5 eval\cf0 \strokec4 ()\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb3 \strokec7 with\cf0 \strokec4  torch.no_grad():\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3     test_outputs = model(features_test)\cb1 \
+\cb3     test_predictions = test_outputs.squeeze()\cb1 \
+\cb3     test_target_np = target_test.numpy()\cb1 \
+\cb3     test_predictions_np = test_predictions.numpy()\cb1 \
+\
+\cb3     \cf9 \strokec9 # Calculate metrics\cf0 \cb1 \strokec4 \
+\cb3     test_mse = mean_squared_error(test_target_np, test_predictions_np)\cb1 \
+\cb3     test_rmse = np.sqrt(test_mse)\cb1 \
+\cb3     test_mae = np.mean(np.\cf5 \strokec5 abs\cf0 \strokec4 (test_target_np - test_predictions_np))\cb1 \
+\cb3     test_r2 = r2_score(test_target_np, test_predictions_np)\cb1 \
+\
+\cb3     \cf5 \strokec5 print\cf0 \strokec4 (\cf2 \strokec2 f\cf10 \strokec10 'Test Mean Squared Error (MSE): \cf0 \strokec4 \{test_mse\cf8 \strokec8 :.4f\cf0 \strokec4 \}\cf10 \strokec10 '\cf0 \strokec4 )\cb1 \
+\cb3     \cf5 \strokec5 print\cf0 \strokec4 (\cf2 \strokec2 f\cf10 \strokec10 'Test Root Mean Squared Error (RMSE): \cf0 \strokec4 \{test_rmse\cf8 \strokec8 :.4f\cf0 \strokec4 \}\cf10 \strokec10 '\cf0 \strokec4 )\cb1 \
+\cb3     \cf5 \strokec5 print\cf0 \strokec4 (\cf2 \strokec2 f\cf10 \strokec10 'Test Mean Absolute Error (MAE): \cf0 \strokec4 \{test_mae\cf8 \strokec8 :.4f\cf0 \strokec4 \}\cf10 \strokec10 '\cf0 \strokec4 )\cb1 \
+\cb3     \cf5 \strokec5 print\cf0 \strokec4 (\cf2 \strokec2 f\cf10 \strokec10 'Test R2 Score: \cf0 \strokec4 \{test_r2\cf8 \strokec8 :.4f\cf0 \strokec4 \}\cf10 \strokec10 '\cf0 \strokec4 )\cb1 \
+\cb3     stop, best_val_loss, counter = check_early_stopping(epoch_loss, best_val_loss, patience, counter)\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb3 \strokec7 if\cf0 \strokec4  stop:\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3     \cf5 \strokec5 print\cf0 \strokec4 (\cf10 \strokec10 "Early stopping triggered."\cf0 \strokec4 )\cb1 \
+\cb3     \cf7 \strokec7 break\cf0 \cb1 \strokec4 \
+}
